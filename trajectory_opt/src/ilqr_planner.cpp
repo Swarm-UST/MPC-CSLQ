@@ -8,15 +8,15 @@ namespace trajectory_opt
         this->Qf = Qf;
         this->R = R;
     }
-    bool IlqrPlanner::optimize_trajectory(Eigen::MatrixXd &X_opt, Eigen::MatrixXd &U_opt, Eigen::MatrixXd X, Eigen::MatrixXd U, const Eigen::Vector3d x_tar,const double dt) const
+    bool IlqrPlanner::optimize_trajectory(Eigen::MatrixXd &X_opt, Eigen::MatrixXd &U_opt, Eigen::MatrixXd X, Eigen::MatrixXd U, const Eigen::Vector3d x_tar, const double dt) const
     {
         ROS_DEBUG_STREAM("Q \n"
-                        << Q << "\nQf \n"
-                        << Qf << "\nR \n"
-                        << R << '\n');
+                         << Q << "\nQf \n"
+                         << Qf << "\nR \n"
+                         << R << '\n');
         ROS_DEBUG_STREAM("l " << length_ << " r " << r_wheel_ << " cost_thres_ " << cost_thres_ << '\n');
         ROS_DEBUG_STREAM(" iter_num_ " << iter_num_ << " line_iter_num_ " << line_iter_num_ << '\n');
-        
+
         const int N = X.cols();
 
         std::vector<Eigen::MatrixXd> K_(N - 1, Eigen::MatrixXd::Zero(2, 3));
@@ -66,7 +66,6 @@ namespace trajectory_opt
                 double c = cost(X_, U_, Q, R, Qf, x_tar, Eigen::Vector2d::Zero());
                 if (c < c_init)
                 {
-                    std::cout << c << std::endl;
                     break;
                 }
             }
@@ -76,17 +75,5 @@ namespace trajectory_opt
         X_opt = X;
         U_opt = U;
     }
-
-    // bool IlqrPlanner::optimize_trajectory(Eigen::MatrixXd &X_opt, Eigen::MatrixXd &U_opt, const Eigen::MatrixXd &X_src, const Eigen::MatrixXd &U_src, const Eigen::Vector3d &x_tar, double dt)
-    // {
-    //     ROS_INFO_STREAM("Q \n"
-    //                     << Q << "\nQf \n"
-    //                     << Qf << "\nR \n"
-    //                     << R << '\n');
-    //     ROS_INFO_STREAM("l " << length_ << " r " << r_wheel_ << " cost_thres_ " << cost_thres_ << '\n');
-    //     ROS_INFO_STREAM(" iter_num_ " << iter_num_ << " line_iter_num_ " << line_iter_num_ << '\n');
-        
-    //     ilqr(X_opt, U_opt, X_src, U_src, x_tar, dt, length_, r_wheel_);
-    // }
 
 } // namespace trajectory_opt

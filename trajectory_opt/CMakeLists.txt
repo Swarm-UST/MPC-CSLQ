@@ -109,13 +109,16 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES 
-    ${PROJECT_NAME}_ilqr_planner
-    ${PROJECT_NAME}_common_funcs
-    ${PROJECT_NAME}_ros_conversion
+#  LIBRARIES 
+#     ${PROJECT_NAME}_ilqr_planner
+#     ${PROJECT_NAME}_common_funcs
+#     ${PROJECT_NAME}_ros_conversion
+#     ${PROJECT_NAME}_init_trajectory
+#     ${PROJECT_NAME}_p_controller
  CATKIN_DEPENDS 
     roscpp
     std_msgs
+    nav_msgs
 #  DEPENDS system_lib
 )
 
@@ -132,56 +135,33 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library( ${PROJECT_NAME}_ilqr
-#   src/ilqr.cpp
-# )
-# add_dependencies(${PROJECT_NAME}_ilqr 
-#   ${PROJECT_NAME}_common_funcs  
-# )
-# target_link_libraries(${PROJECT_NAME}_ilqr
-#   ${PROJECT_NAME}_common_funcs
-# )
 
-add_library( ${PROJECT_NAME}_ros_conversion
-  src/ros_conversion.cpp
-)
-target_link_libraries(${PROJECT_NAME}_ros_conversion
-  ${catkin_LIBRARIES}
-)
-
-add_library( ${PROJECT_NAME}_ilqr_planner
+add_executable(${PROJECT_NAME}_service 
+  src/common_funcs.cpp
   src/ilqr_planner.cpp
+  src/init_trajectory.cpp
+  src/p_controller.cpp
+  src/ros_conversion.cpp
+  src/ilqr_planner_service.cpp
+  src/trajectory_opt_planning_service.cpp
 )
-add_dependencies(${PROJECT_NAME}_ilqr_planner 
-  ${PROJECT_NAME}_common_funcs  
-)
-
-target_link_libraries(${PROJECT_NAME}_ilqr_planner 
-  ${PROJECT_NAME}_common_funcs
-  # ${PROJECT_NAME}_ilqr
+target_link_libraries(${PROJECT_NAME}_service 
   ${catkin_LIBRARIES}
 )
+add_dependencies(${PROJECT_NAME}_service ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-add_library( ${PROJECT_NAME}_common_funcs
-  src/common_funcs.cpp  
-)
-target_link_libraries(${PROJECT_NAME}_common_funcs 
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node src/trajectory_opt_planning_node.cpp)
-add_dependencies(${PROJECT_NAME}_node 
-  ${PROJECT_NAME}_ilqr_planner
-  ${PROJECT_NAME}_common_funcs
-  ${PROJECT_NAME}_ros_conversion
-)
-
+add_executable(${PROJECT_NAME}_node 
+  src/common_funcs.cpp
+  src/ilqr_planner.cpp
+  src/init_trajectory.cpp
+  src/p_controller.cpp
+  src/ros_conversion.cpp
+  src/trajectory_opt_planning_node.cpp
+  )
 target_link_libraries(${PROJECT_NAME}_node 
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_common_funcs
-  ${PROJECT_NAME}_ilqr_planner
-  ${PROJECT_NAME}_ros_conversion
 )
+add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

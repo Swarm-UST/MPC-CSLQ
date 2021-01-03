@@ -1,5 +1,15 @@
-std_msgs/Float64MultiArray state
-std_msgs/Float64MultiArray control_input
----
-std_msgs/Float64MultiArray opt_state
-std_msgs/Float64MultiArray opt_input
+std_msgs/Float32MultiArray state
+std_msgs/Float32MultiArray control_input
+std_msgs/Float32MultiArray target
+std_msgs/Float32MultiArray Qf
+std_msgs/Float32MultiArray Q
+std_msgs/Float32MultiArray R
+float32                    l
+float32                    r
+float32                    dt
+--- 
+bool                       success
+string                     error
+std_msgs/Float32MultiArray opt_state
+std_msgs/Float32MultiArray opt_input
+std_msgs/Float32MultiArray K

@@ -3,7 +3,7 @@
 
 namespace trajectory_opt
 {
-    void init_trajectory(Eigen::MatrixXd &X, Eigen::MatrixXd &U,const Eigen::MatrixXd waypoints,const double dt,const double l,const double r,const double thres)
+    void init_trajectory(Eigen::MatrixXd &X, Eigen::MatrixXd &U, const Eigen::MatrixXd waypoints, const double dt, const double l, const double r, const double thres)
     {
         std::vector<double> x_vec, u_vec;
         x_vec.push_back(waypoints(0, 0));

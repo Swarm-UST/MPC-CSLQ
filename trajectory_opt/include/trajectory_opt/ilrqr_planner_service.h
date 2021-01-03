@@ -3,19 +3,25 @@
 #include <ros/ros.h>
 #include <trajectory_opt/OptimizeTrajectory.h>
 #include "trajectory_opt/ilqr_planner.h"
+#include "trajectory_opt/ros_conversion.h"
+#include "std_msgs/Float32MultiArray.h"
+#include "eigen_conversions/eigen_msg.h"
+#include <string>
+#include <Eigen/Dense>
 
 namespace trajectory_opt
 {
     class IlqrService
     {
     private:
-        ros::SericeServer optimize_trajectory_service_;
-        IlqrPlanner planner_;
+        ros::ServiceServer optimize_trajectory_service_;
 
     public:
         IlqrService(ros::NodeHandle &nh, ros::NodeHandle &pnh);
-        optimize_trajectory(OptimizeTrajectory::Request &request, OptimizeTrajectory::Response &response);
-    }
+        bool optimize_trajectory(OptimizeTrajectory::Request &request, OptimizeTrajectory::Response &response);
+        void error(OptimizeTrajectory::Response &response, std::string msg);
+    };
+
 } // namespace trajectory_opt
 
 #endif
