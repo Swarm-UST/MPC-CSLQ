@@ -1,15 +1,10 @@
 std_msgs/Float32MultiArray state
-std_msgs/Float32MultiArray control_input
 std_msgs/Float32MultiArray target
-std_msgs/Float32MultiArray Qf
-std_msgs/Float32MultiArray Q
-std_msgs/Float32MultiArray R
-float32                    l
-float32                    r
-float32                    dt
+std_msgs/Float32MultiArray constraints
+float32 T_horizon
 --- 
 bool                       success
 string                     error
 std_msgs/Float32MultiArray opt_state
 std_msgs/Float32MultiArray opt_input
-std_msgs/Float32MultiArray K
+std_msgs/Float32MultiArray opt_feedback

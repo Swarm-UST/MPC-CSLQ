@@ -24,22 +24,57 @@ namespace trajectory_opt
         }
         path = path_msg;
     }
-
+    // multiarray(i,j,k) refers to the ith row, jth column, and kth channel.
     void matrixEigenToMsg(const Eigen::MatrixXd &e, std_msgs::Float32MultiArray &m)
     {
         if (m.layout.dim.size() != 2)
             m.layout.dim.resize(2);
+    
         m.layout.dim[0].stride = e.rows() * e.cols();
-        m.layout.dim[0].size = e.cols();
-        m.layout.dim[1].stride = e.rows();
-        m.layout.dim[1].size = e.rows();
+        m.layout.dim[0].size = e.rows();
+
+        m.layout.dim[1].stride = e.cols();
+        m.layout.dim[1].size = e.cols();
+
         if ((int)m.data.size() != e.size())
             m.data.resize(e.size());
         int ii = 0;
-        for (int i = 0; i < e.cols(); ++i)
-            for (int j = 0; j < e.rows(); ++j)
-                m.data[ii++] = e(j, i);
+        for (int i = 0; i < m.layout.dim[0].size; i++)
+            for (int j = 0; j < m.layout.dim[1].size; j++)
+                m.data[ii++] = e(i,j);
+
     }
+
+    void VectorEigenMatrixToMsg(const std::vector<Eigen::MatrixXd> & e, std_msgs::Float32MultiArray &m)
+    {
+
+        if (m.layout.dim.size() != 3)
+            m.layout.dim.resize(3);
+        
+        int rows_ = e[0].rows();
+        int columns_ = e[0].cols();
+        int length_ = e.size();
+
+        m.layout.dim[0].stride = length_*rows_*columns_;
+        m.layout.dim[0].size = rows_;
+
+        m.layout.dim[1].stride = length_*columns_;
+        m.layout.dim[1].size = columns_;
+
+        m.layout.dim[2].stride = length_;
+        m.layout.dim[2].size = length_;     
+
+        if ((int)m.data.size() != m.layout.dim[0].stride)
+            m.data.resize(m.layout.dim[0].stride);
+
+        int ii = 0;
+        for (int i = 0; i < m.layout.dim[0].size;i++)
+            for (int j = 0; j < m.layout.dim[1].size; j++)
+                for (int k = 0; k < m.layout.dim[2].size; k++) 
+                    m.data[ii++] = e[k](i,j);
+    }
+
+
     void msgTomatrixEigen(const std_msgs::Float32MultiArray &msg, Eigen::MatrixXd &e)
     {
         int columns = msg.layout.dim[0].size;
@@ -48,4 +83,6 @@ namespace trajectory_opt
         Eigen::Map<const Eigen::MatrixXf> m_e(msg.data.data(), rows, columns);
         e = m_e.cast<double>();
     }
+
+    
 } // namespace trajectory_opt

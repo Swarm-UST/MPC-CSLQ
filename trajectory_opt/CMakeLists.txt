@@ -137,12 +137,13 @@ include_directories(
 ## Declare a C++ library
 
 add_executable(${PROJECT_NAME}_service 
-  src/common_funcs.cpp
-  src/ilqr_planner.cpp
-  src/init_trajectory.cpp
+  src/utility.cpp
+  src/ilqr.cpp
+  src/plan_trajectory_potential.cpp
   src/p_controller.cpp
   src/ros_conversion.cpp
   src/ilqr_planner_service.cpp
+  src/constraint.cpp
   src/trajectory_opt_planning_service.cpp
 )
 target_link_libraries(${PROJECT_NAME}_service 
@@ -150,18 +151,18 @@ target_link_libraries(${PROJECT_NAME}_service
 )
 add_dependencies(${PROJECT_NAME}_service ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-add_executable(${PROJECT_NAME}_node 
-  src/common_funcs.cpp
-  src/ilqr_planner.cpp
-  src/init_trajectory.cpp
-  src/p_controller.cpp
-  src/ros_conversion.cpp
-  src/trajectory_opt_planning_node.cpp
-  )
-target_link_libraries(${PROJECT_NAME}_node 
-  ${catkin_LIBRARIES}
-)
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
+#add_executable(${PROJECT_NAME}_node 
+#  src/common_funcs.cpp
+#  src/ilqr_planner.cpp
+#  src/init_trajectory.cpp
+#  src/p_controller.cpp
+#  src/ros_conversion.cpp
+#  src/trajectory_opt_planning_node.cpp
+#  )
+#target_link_libraries(${PROJECT_NAME}_node 
+#  ${catkin_LIBRARIES}
+#)
+#add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

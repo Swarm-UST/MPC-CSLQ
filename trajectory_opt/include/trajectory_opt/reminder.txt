@@ -1,0 +1,11 @@
+u_max is in utility.cpp 
+r,l,dt  test.cpp
+
+gain, w_gain in plan_trajectory_potential.cpp
+
+
+please run these two commend before running the code
+
+export PYTHONHOME=/home/jtangas/anaconda3/envs/MPC
+
+export LD_LIBRARY_PATH=/home/jtangas/anaconda3/envs/MPC/lib
