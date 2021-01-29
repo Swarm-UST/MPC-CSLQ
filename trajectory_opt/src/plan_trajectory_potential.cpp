@@ -26,16 +26,16 @@ namespace trajectory_opt
         X_container.push_back(cur_pos(2));
         Eigen::Vector2d error = cur_pos.head(2) - tar_pos.head(2);
         int count = 0;
-        while (error.norm() > tolerance)
+        while (true)//error.norm() > tolerance)
         {
             count += 1;
-            if (count > 15000) break;
-            Eigen::Vector2d twist = p_controller(cur_pos, tar_pos, l, r);
+            if (count > 2000) break;
+            Eigen::Vector2d ori_twist = p_controller(cur_pos, tar_pos, l, r);
             Eigen::Vector2d cur_orien_vec(cos(cur_pos(2)), sin(cur_pos(2)));
             
-            Eigen::Vector2d u = twistToWheelSpeed(twist, l, r);
+            Eigen::Vector2d u = twistToWheelSpeed(ori_twist, l, r);
             saturateWheelSpeed(u);
-            twist = wheelSpeedToTwist(u, l, r);
+            Eigen::Vector2d twist = wheelSpeedToTwist(u, l, r);
             Eigen::Vector2d cur_linear_velocity_vec = cur_orien_vec * twist(0);
 
             Eigen::Vector2d force(0, 0);
@@ -74,8 +74,8 @@ namespace trajectory_opt
             else
             {
                 // twist(0) += (force_in_linear_velocity < 0 ? force_in_linear_velocity:0)* static_cast<double>(get_sign<double>(twist(0))) ;
-                force_in_linear_velocity = (force_in_linear_velocity < 0 ? force_in_linear_velocity : 0);
-                twist(0) += (force_in_linear_velocity < -abs(twist(0)) ? -abs(twist(0)):force_in_linear_velocity)* static_cast<double>(get_sign<double>(twist(0))) ;
+                double force_in_linear_velocity_zero = (force_in_linear_velocity < 0 ? force_in_linear_velocity : 0);
+                twist(0) += (force_in_linear_velocity_zero < -abs(twist(0)) ? -abs(twist(0)):force_in_linear_velocity_zero)* static_cast<double>(get_sign<double>(twist(0))) ;
                 Eigen::Vector3d rotation_vec = Eigen::Vector3d(cur_linear_velocity_vec(0), cur_linear_velocity_vec(1), 0).cross(Eigen::Vector3d(force(0), force(1), 0));
                 if (rotation_vec(2) > 0)
                 {

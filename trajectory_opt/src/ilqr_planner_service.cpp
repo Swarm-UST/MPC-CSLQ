@@ -33,6 +33,7 @@ namespace trajectory_opt
         {
             Eigen::MatrixXd init,tar,Cons;
             msgTomatrixEigen(request.state, init);
+            
             msgTomatrixEigen(request.target, tar);
             msgTomatrixEigen(request.constraints,Cons);
             double r = 0.025, l = 0.0835, dt = 1.0/120;
@@ -44,20 +45,20 @@ namespace trajectory_opt
             {
                 if (Cons(5,i) == 0) // If the constraint type is circle
                 {
-                    soft_constraints.emplace_back(Eigen::Vector2d(Cons(0,i),Cons(1,i)),Cons(2,i));
-                    hard_constraints.emplace_back(Eigen::Vector2d(Cons(0,i),Cons(1,i)),Cons(2,i)-Cons(4,i));
+                    soft_constraints.emplace_back(Eigen::Vector2d(Cons(0,i),Cons(1,i)),Cons(2,i)+Cons(4,i));
+                    hard_constraints.emplace_back(Eigen::Vector2d(Cons(0,i),Cons(1,i)),Cons(2,i));
 
                 }
-                else // If the constraint type is sqaure
+                else // If the constraint type is retangular
                 {
-                    soft_constraints.emplace_back(Eigen::Vector2d(Cons(0,i),Cons(1,i)),Cons(2,i),Cons(3,i));
-                    hard_constraints.emplace_back(Eigen::Vector2d(Cons(0,i)+Cons(4,i),Cons(1,i)+Cons(4,i)),Cons(2,i)-Cons(4,i),Cons(3,i)-Cons(4,i));
+                    hard_constraints.emplace_back(Eigen::Vector2d(Cons(0,i),Cons(1,i)),Cons(2,i),Cons(3,i));
+                    soft_constraints.emplace_back(Eigen::Vector2d(Cons(0,i)-Cons(4,i),Cons(1,i)-Cons(4,i)),Cons(2,i)+2*Cons(4,i),Cons(3,i)+2*Cons(4,i));
                 }
             }
             double T_Horizon = request.T_horizon;
 
             Eigen::Vector3d X_tar(tar(0, 0), tar(1, 0), tar(2, 0));
-            Eigen::Vector3d X_init(init(0,0), init(2,0), init(2,0));
+            Eigen::Vector3d X_init(init(0,0), init(1,0), init(2,0));
 
             Eigen::MatrixXd X_MPC,U_MPC;
             std::vector<Eigen::MatrixXd> K_MPC;

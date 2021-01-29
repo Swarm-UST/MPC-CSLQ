@@ -3,7 +3,7 @@
 #include "trajectory_opt/ilqr.h"
 #include "trajectory_opt/utility.h"
 #include <chrono>
-
+#include <cmath>
 void ilqr(Eigen::MatrixXd& X_opt, Eigen::MatrixXd& U_opt,std::vector<Eigen::MatrixXd>& K_opt, const Eigen::MatrixXd& X_src, const Eigen::MatrixXd& U_src, const Eigen::Vector3d& x_tar, double dt, double l, double r_wheel,const std::vector<trajectory_opt::Constraint> &soft_constraints, const std::vector<trajectory_opt::Constraint> &hard_constraints)
 {
     Eigen::MatrixXd X = X_src, U = U_src;
@@ -98,7 +98,9 @@ void ilqr(Eigen::MatrixXd& X_opt, Eigen::MatrixXd& U_opt,std::vector<Eigen::Matr
             // This part is to check whether the trajectory has violated the constraint
             for(int i = 0;i < N-1;i++)
             {
-                U_.col(i) = U.col(i) + alpha*l_.col(i) + K_[i]*(X_.col(i) - X.col(i));
+                Eigen::Vector3d error = (X_.col(i) - X.col(i));
+                error(2) = std::atan2(std::sin(error(2)),std::cos(error(2)));
+                U_.col(i) = U.col(i) + alpha*l_.col(i) + K_[i]*(error);
                 X_.col(i+1) = f(X_.col(i),U_.col(i),dt, l,r_wheel);
                 // The number of soft constraint and hard constraint are assumed to be equal
                 for(int con_count=0;con_count<soft_constraints.size();con_count++)
@@ -141,14 +143,15 @@ int MPC(Eigen::MatrixXd& X_MPC, Eigen::MatrixXd& U_MPC ,std::vector<Eigen::Matri
     trajectory_opt::planTrajectory(X, U, x, x_tar, soft_constraints, hard_constraints, dt, l, r_wheel, tol);
 
     int T = (X.cols() > int(T_Horizon/dt)?int(T_Horizon/dt):X.cols());
-    
+
+
+
     X.conservativeResize(Eigen::NoChange,T);
     U.conservativeResize(Eigen::NoChange,T);
 
     //std::cout<<T<<std::endl;
 
-    //X_MPC = X;
-    //U_MPC = U;
+
     ilqr(X_MPC, U_MPC, K_MPC, X, U, x_tar, dt, l, r_wheel,soft_constraints, hard_constraints);
     auto stop = std::chrono::high_resolution_clock::now(); 
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); 

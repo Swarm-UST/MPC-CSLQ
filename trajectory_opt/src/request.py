@@ -3,7 +3,7 @@ from trajectory_opt.srv import OptimizeTrajectory
 import sys
 import rospy
 from std_msgs.msg import Float32MultiArray,MultiArrayDimension
-
+import time
 import numpy as np
 
 
@@ -42,14 +42,17 @@ def main():
     c = np.matrix("1,1.2,0.1,0.2,0.03,1.0;0.5,0,0.2,0.2,0.03,1.0;0,0.5,0.2,0.2,0.03,0.0").T
     cons = npToMultiArray(c)
     rospy.init_node('Opt_client')
+    start = time.time()
     rospy.wait_for_service("optimize_trajectory")
     service = rospy.ServiceProxy("optimize_trajectory", OptimizeTrajectory)
     result = service(x_init,x_tar,cons,0.5)
-    print(MultiArrayTonp(result.opt_state))
+    end = time.time()
+    print(end-start)
+    print(MultiArrayTonp(result.opt_state).shape)
     print("")
-    print(MultiArrayTonp(result.opt_input))
+    print(MultiArrayTonp(result.opt_input).shape)
     print("")
-    print(MultiArrayTonp(result.opt_feedback))
+    print(MultiArrayTonp(result.opt_feedback).shape)
 
     return 
 
