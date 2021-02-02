@@ -20,25 +20,83 @@ namespace trajectory_opt
         }
         else
         {
+            double corner_radius = 0.1;
             Eigen::Vector2d center_to_cur_vec = cur_pos - center_pos;
             double angle = atan2(center_to_cur_vec(1), center_to_cur_vec(0));
             double cut_off_angle = atan2(height, width);
+            double top_cut_off_angle = atan2(height,width-corner_radius);
+            double side_cut_off_angle = atan2(height-corner_radius,width);
             if (angle >= -M_PI + cut_off_angle && angle < -cut_off_angle) //bottom
             {
-                return Eigen::Vector2d(0, cur_pos(1) - (left_bottom_pos(1)));
+                if (angle >= - top_cut_off_angle) // Bottom right corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+width-corner_radius,left_bottom_pos(1)+corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else if (angle <= -M_PI + top_cut_off_angle) // Bottom left corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else
+                {
+                    return Eigen::Vector2d(0, cur_pos(1) - (left_bottom_pos(1)));
+                }
             }
             else if (angle >= -cut_off_angle && angle < cut_off_angle) //right
             {
-                return Eigen::Vector2d(cur_pos(0) - (left_bottom_pos(0) + width), 0);
+                if (angle <= - side_cut_off_angle) // Bottom right corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+width-corner_radius,left_bottom_pos(1)+corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else if (angle >= side_cut_off_angle) // Top right corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+width-corner_radius,left_bottom_pos(1)+height-corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else
+                {
+                    return Eigen::Vector2d(cur_pos(0) - (left_bottom_pos(0) + width), 0);
+                }
+                
             }
             else if (angle >= cut_off_angle && angle < M_PI - cut_off_angle) //top
             {
-                return  Eigen::Vector2d(0, cur_pos(1) - (left_bottom_pos(1) + height));
+                if (angle >= M_PI - top_cut_off_angle) // Top left corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+height-corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else if (angle <= top_cut_off_angle) // Top right corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+width-corner_radius,left_bottom_pos(1)+height-corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else
+                {
+                    return  Eigen::Vector2d(0, cur_pos(1) - (left_bottom_pos(1) + height));
+                }
+                
             }
             else //left
             {
-                return Eigen::Vector2d(cur_pos(0) - (left_bottom_pos(0)), 0);
+                if (angle <= M_PI - side_cut_off_angle) // Top left corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+height-corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else if (angle >= - M_PI + side_cut_off_angle) // Bottom left corner
+                {
+                   Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+corner_radius);
+                   return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
+                }
+                else
+                {
+                    return Eigen::Vector2d(cur_pos(0) - (left_bottom_pos(0)), 0);
+                }
             }
+                
         }
     }
     bool Constraint::isInConstraint(const Eigen::Vector2d cur_pos) const
@@ -51,10 +109,39 @@ namespace trajectory_opt
         {
             double x = cur_pos(0), y = cur_pos(1);
             double x_ref = left_bottom_pos(0), y_ref = left_bottom_pos(1);
-            if (x >= x_ref && x <= x_ref + width && y >= y_ref && y <= y_ref + height)
+            double corner_radius = 0.1;
+
+            // check whether it is inside four circle at the corner
+            // Top right corner
+            if((cur_pos - Eigen::Vector2d(left_bottom_pos(0)+width-corner_radius,left_bottom_pos(1)+height-corner_radius)).norm() <= corner_radius)
+            {
                 return true;
+            }// Top left corner
+            else if ((cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+height-corner_radius)).norm() <= corner_radius)
+            {
+                return true;
+            }// Bottom right corner
+            else if ((cur_pos - Eigen::Vector2d(left_bottom_pos(0)+width-corner_radius,left_bottom_pos(1)+corner_radius)).norm() <= corner_radius)
+            {       
+                return true;
+            }// Bottom left corner
+            else if ((cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+corner_radius)).norm() <= corner_radius)
+            {
+                return true;
+            }// wide rectangle 
+            else if (x >= x_ref && x <= x_ref + width && y >= y_ref + corner_radius && y <= y_ref + height -corner_radius)
+            {
+                return true;
+            }// tall rectangle
+            else if (x >= x_ref + corner_radius && x <= x_ref + width - corner_radius && y >= y_ref  && y <= y_ref + height )
+            {
+                return true;
+            }
             else
-                return false;
+            {
+               return false;
+            }
+                
             
         }
     }

@@ -55,7 +55,11 @@ namespace trajectory_opt
                 }
                 force += (gain / displace_vec.squaredNorm()) * displace_vec.normalized();
             }
-
+            if (isInSoftConstraint == true)
+            {
+                force *= 100;
+            }
+                
             double force_in_linear_velocity = force.dot(cur_linear_velocity_vec.normalized());
             Eigen::Vector2d force_in_linear_velocity_vec = force_in_linear_velocity * cur_linear_velocity_vec.normalized();
             if (isInSoftConstraint)
@@ -64,11 +68,11 @@ namespace trajectory_opt
                 Eigen::Vector3d rotation_vec = Eigen::Vector3d(cur_linear_velocity_vec(0), cur_linear_velocity_vec(1), 0).cross(Eigen::Vector3d(force(0), force(1), 0));
                 if (rotation_vec(2) > 0)
                 {
-                    twist(1) += w_gain * (force - force_in_linear_velocity_vec).norm();
+                    twist(1) += 10*w_gain * (force - force_in_linear_velocity_vec).norm();
                 }
                 else
                 {
-                    twist(1) -= w_gain * (force - force_in_linear_velocity_vec).norm();
+                    twist(1) -= 10*w_gain * (force - force_in_linear_velocity_vec).norm();
                 }
             }
             else
@@ -79,11 +83,11 @@ namespace trajectory_opt
                 Eigen::Vector3d rotation_vec = Eigen::Vector3d(cur_linear_velocity_vec(0), cur_linear_velocity_vec(1), 0).cross(Eigen::Vector3d(force(0), force(1), 0));
                 if (rotation_vec(2) > 0)
                 {
-                    twist(1) += w_gain * std::abs(force_in_linear_velocity);
+                    twist(1) += w_gain * std::abs(force_in_linear_velocity_zero);
                 }
                 else
                 {
-                    twist(1) -= w_gain *  std::abs(force_in_linear_velocity);
+                    twist(1) -= w_gain *  std::abs(force_in_linear_velocity_zero);
                 }
             }
 

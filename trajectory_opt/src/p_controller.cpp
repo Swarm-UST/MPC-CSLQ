@@ -4,7 +4,7 @@
 
 Eigen::Vector2d p_controller(Eigen::Vector3d x, Eigen::Vector3d tar, double l, double r)
 {
-    double Kp_linear = 1000/(r);
+    double Kp_linear = 1500/(r);
     double Kp_angular = 1000/(r);
 
     Eigen::Vector3d error = tar - x;
