@@ -81,12 +81,12 @@ namespace trajectory_opt
             }
             else //left
             {
-                if (angle <= M_PI - side_cut_off_angle) // Top left corner
+                if (angle <= M_PI - side_cut_off_angle && angle > 0) // Top left corner
                 {
                    Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+height-corner_radius);
                    return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();
                 }
-                else if (angle >= - M_PI + side_cut_off_angle) // Bottom left corner
+                else if (angle >= - M_PI + side_cut_off_angle && angle < 0) // Bottom left corner
                 {
                    Eigen::Vector2d from_center_vec = cur_pos - Eigen::Vector2d(left_bottom_pos(0)+corner_radius,left_bottom_pos(1)+corner_radius);
                    return (from_center_vec)*(from_center_vec.norm()-corner_radius)/from_center_vec.norm();

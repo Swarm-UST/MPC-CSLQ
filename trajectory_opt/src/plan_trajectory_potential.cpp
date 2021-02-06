@@ -57,7 +57,7 @@ namespace trajectory_opt
             }
             if (isInSoftConstraint == true)
             {
-                force *= 100;
+                force *= 20;
             }
                 
             double force_in_linear_velocity = force.dot(cur_linear_velocity_vec.normalized());
@@ -102,8 +102,8 @@ namespace trajectory_opt
             error = cur_pos.head(2) - tar_pos.head(2);
             //std::cout<<error.norm()<<std::endl;
         }
-        Eigen::Map<Eigen::MatrixXd> X_m(X_container.data(), 3, (int)(X_container.size() / 3));
-        Eigen::Map<Eigen::MatrixXd> U_m(U_container.data(), 2, (int)(U_container.size() / 2));
+        Eigen::Map<Eigen::MatrixXd> X_m(X_container.data(), 3, (X_container.size() + 2)/ 3);
+        Eigen::Map<Eigen::MatrixXd> U_m(U_container.data(), 2, (U_container.size() + 1)/ 2);
         X = X_m;
         U = U_m;
     }
