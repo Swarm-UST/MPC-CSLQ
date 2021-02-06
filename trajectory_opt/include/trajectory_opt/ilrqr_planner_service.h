@@ -5,6 +5,7 @@
 #include "trajectory_opt/ilqr.h"
 #include "trajectory_opt/ros_conversion.h"
 #include "std_msgs/Float32MultiArray.h"
+#include "nav_msgs/Path.h"
 #include "eigen_conversions/eigen_msg.h"
 #include <string>
 #include <Eigen/Dense>
@@ -17,7 +18,8 @@ namespace trajectory_opt
     {
     private:
         ros::ServiceServer optimize_trajectory_service_;
-
+        ros::Publisher global_path_pub_;
+        
     public:
         IlqrService(ros::NodeHandle &nh, ros::NodeHandle &pnh);
         bool optimize_trajectory(OptimizeTrajectory::Request &request, OptimizeTrajectory::Response &response);
